@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>莫蘭迪｜奶油日誌 V64 (功能修正版)</title>
+    <title>莫蘭迪｜奶油日誌 V65 (導航文字美化版)</title>
     <style>
         :root {
             --bg-page: #F2EEE5;           
@@ -22,13 +22,9 @@
         * { -webkit-tap-highlight-color: transparent; font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif; color: var(--text-deep) !important; box-sizing: border-box; }
         body { background-color: var(--bg-page); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 
-        .main-wrapper { 
-            display: flex; width: 100%; height: 100vh; 
-            background: var(--bg-paper); 
-            position: relative; overflow: hidden; 
-        }
+        .main-wrapper { display: flex; width: 100%; height: 100vh; background: var(--bg-paper); position: relative; overflow: hidden; }
 
-        /* 側邊欄 */
+        /* 側邊欄：固定高品質格式 */
         .sidebar { 
             width: 330px; background: #FAF9F6; border-right: 1.5px solid var(--border-light); 
             padding: 30px 25px 120px 25px; 
@@ -50,22 +46,25 @@
         .time-box { display: flex; align-items: center; gap: 10px; background: #FDFBF8; padding: 8px; border-radius: 12px; border: 1px solid var(--border-light); }
         .time-box select { flex: 1; border: 1px solid var(--border-heavy); text-align: center; padding: 8px; background: #FFF; font-weight: 700; font-size: 1rem; }
 
-        .save-btn { background: var(--m-brown); color: #FFF !important; border: none; padding: 18px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 1.1rem; }
+        .save-btn { background: var(--m-brown); color: #FFF !important; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 1.1rem; }
         
+        /* 底部返回區域：美化文字 */
         .sidebar-footer { position: sticky; bottom: -30px; left: 0; width: 100%; background: linear-gradient(to top, #FAF9F6 80%, transparent); padding: 20px 0; margin-top: auto; }
-        .back-btn { width: 100%; background: #FFF; color: var(--m-brown) !important; border: 1.5px solid var(--m-brown); padding: 15px; border-radius: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .back-btn { 
+            width: 100%; background: #FFF; color: var(--m-brown) !important; 
+            border: 1.5px solid var(--m-brown); padding: 15px; border-radius: 18px; 
+            font-weight: 900; cursor: pointer; display: flex; align-items: center; 
+            justify-content: center; gap: 10px; font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(191, 168, 145, 0.1);
+        }
 
-        /* 日曆區域 */
+        /* 日曆區域：大視野與極細框 */
         .calendar-content { flex: 1; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
         .calendar-header { padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: #FFF; border-bottom: 1.5px solid var(--border-light); }
         #headerTitle { cursor: pointer; font-size: 1.6rem; font-weight: 900; color: var(--m-brown) !important; letter-spacing: 1px; }
 
         .grid-container { flex: 1; overflow: auto; background: var(--border-light); }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, minmax(130px, 1fr)); 
-            min-width: 100%; min-height: 100%; gap: 1px; 
-        }
+        .grid { display: grid; grid-template-columns: repeat(7, minmax(130px, 1fr)); min-width: 100%; min-height: 100%; gap: 1px; }
 
         .weekday { text-align: center; padding: 15px 0; font-size: 0.75rem; font-weight: 800; background: #FDFBF8; position: sticky; top: 0; z-index: 10; border-bottom: 1.5px solid var(--border-heavy); }
         .weekday:nth-child(1), .weekday:nth-child(7) { color: var(--weekend-red) !important; }
@@ -81,7 +80,7 @@
         .day-cell.today .num { color: var(--m-pink) !important; border-bottom: 2px solid var(--m-pink); }
         .holiday-tag { position: absolute; top: 8px; right: 8px; font-size: 0.55rem; color: var(--weekend-red) !important; font-weight: 900; background: rgba(197, 123, 123, 0.05); padding: 1px 4px; border-radius: 3px; }
 
-        /* 行程標籤：極細 2px 設計 */
+        /* 行程標籤：2px 極細側邊線 */
         .task-tag { 
             font-size: 0.75rem; padding: 3px 8px; margin-bottom: 4px; 
             border-left: 2px solid transparent; 
@@ -145,16 +144,20 @@
             
             <div id="actionBtns" style="display: none; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1.5px dashed var(--border-heavy); padding-top: 15px;">
                 <button id="toggleDoneBtn" onclick="toggleTaskDone()" style="background:#FFF; border:1.5px solid var(--success-green); color:var(--success-green)!important; padding:12px; border-radius:15px; font-weight:800; cursor:pointer;"></button>
-                <button onclick="deleteCurrentTask()" style="background:#FFF; border:1.5px solid var(--danger-red); color:var(--danger-red)!important; padding:12px; border-radius:15px; font-weight:800; cursor:pointer;">🗑️ 刪除行程</button>
+                <button onclick="deleteCurrentTask()" style="background:#FFF; border:1.5px solid var(--danger-red); color:var(--danger-red)!important; padding:12px; border-radius:15px; font-weight:800; cursor:pointer;">🗑️ 刪除此行程</button>
             </div>
 
             <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="nav-btn" onclick="exportData()" style="font-size: 0.75rem;">📤 匯出</button>
-                <button class="nav-btn" onclick="importData()" style="font-size: 0.75rem;">📥 匯入</button>
+                <button class="nav-btn" onclick="exportData()" style="font-size: 0.75rem;">📤 匯出代碼</button>
+                <button class="nav-btn" onclick="importData()" style="font-size: 0.75rem;">📥 貼上代碼</button>
             </div>
         </div>
         <div id="tabList" style="display:none;"><div id="fullListContainer"></div></div>
-        <div class="sidebar-footer"><button class="back-btn" onclick="toggleSidebar(false)"><span>❮</span> 返回日曆</button></div>
+        <div class="sidebar-footer">
+            <button class="back-btn" onclick="toggleSidebar(false)">
+                <span>❮</span> 返回日曆看行程
+            </button>
+        </div>
     </div>
 
     <div class="calendar-content">
@@ -183,7 +186,7 @@
         let idx = Math.floor(((diffDays % 29.5) + 30) % 29.5) + 1;
         return lunarDays[idx > 30 ? 1 : idx];
     }
-    let db = JSON.parse(localStorage.getItem('creamy_v64')) || [];
+    let db = JSON.parse(localStorage.getItem('creamy_v65')) || [];
     let viewDate = new Date();
     let titleClicks = 0;
 
@@ -232,33 +235,18 @@
     }
     function openEdit(id) {
         const t = db.find(x => x.id === id);
-        document.getElementById('editId').value = t.id; 
-        document.getElementById('inDate').value = t.date; 
-        document.getElementById('inText').value = t.text; 
-        document.getElementById('inMemo').value = t.memo; 
-        document.getElementById('inType').value = t.type; 
-        document.getElementById('timeToggle').checked = t.hasTime;
+        document.getElementById('editId').value = t.id; document.getElementById('inDate').value = t.date; document.getElementById('inText').value = t.text; document.getElementById('inMemo').value = t.memo; document.getElementById('inType').value = t.type; document.getElementById('timeToggle').checked = t.hasTime;
         if(t.hasTime) { document.getElementById('sh').value = t.st.split(':')[0]; document.getElementById('sm').value = t.st.split(':')[1]; document.getElementById('eh').value = t.et.split(':')[0]; document.getElementById('em').value = t.et.split(':')[1]; }
         updateTimeVisibility(); 
-        
-        // 修正點：根據狀態設定按鈕文字
         const btn = document.getElementById('toggleDoneBtn');
-        btn.innerText = t.done ? "⏪ 恢復為未完成" : "✅ 標記為已完成";
-        
+        btn.innerText = t.done ? "⏪ 標記為未完成" : "✅ 標記為已完成";
         document.getElementById('actionBtns').style.display = 'flex'; 
         toggleSidebar(true); switchTab('form');
     }
-    function toggleTaskDone() { 
-        const id = document.getElementById('editId').value; 
-        const task = db.find(t => t.id === id); 
-        if (task) { 
-            task.done = !task.done; 
-            save(); toggleSidebar(false); clearForm(); 
-        } 
-    }
+    function toggleTaskDone() { const id = document.getElementById('editId').value; const task = db.find(t => t.id === id); if (task) { task.done = !task.done; save(); toggleSidebar(false); clearForm(); } }
     function deleteCurrentTask() { const id = document.getElementById('editId').value; if (id && confirm('確定要刪除？')) { db = db.filter(t => t.id !== id); save(); toggleSidebar(false); clearForm(); } }
     function clearForm() { document.getElementById('editId').value = ""; document.getElementById('inText').value = ""; document.getElementById('inMemo').value = ""; document.getElementById('actionBtns').style.display = 'none'; updateTimeVisibility(); }
-    function save() { localStorage.setItem('creamy_v64', JSON.stringify(db)); render(); }
+    function save() { localStorage.setItem('creamy_v65', JSON.stringify(db)); render(); }
     function moveMonth(s) { viewDate.setMonth(viewDate.getMonth() + s); render(); }
     function toggleSidebar(show) { document.getElementById('sidebar').classList.toggle('active', show); document.getElementById('overlay').style.display = show ? 'block' : 'none'; }
     function handleTitleClick() { titleClicks++; if(titleClicks === 3) { toggleSidebar(true); titleClicks = 0; } setTimeout(() => titleClicks = 0, 800); }
