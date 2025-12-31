@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>莫蘭迪｜奶油日誌 V63 (極細精緻版)</title>
+    <title>莫蘭迪｜奶油日誌 V64 (功能修正版)</title>
     <style>
         :root {
             --bg-page: #F2EEE5;           
@@ -28,7 +28,7 @@
             position: relative; overflow: hidden; 
         }
 
-        /* 側邊欄設計 */
+        /* 側邊欄 */
         .sidebar { 
             width: 330px; background: #FAF9F6; border-right: 1.5px solid var(--border-light); 
             padding: 30px 25px 120px 25px; 
@@ -61,7 +61,6 @@
         #headerTitle { cursor: pointer; font-size: 1.6rem; font-weight: 900; color: var(--m-brown) !important; letter-spacing: 1px; }
 
         .grid-container { flex: 1; overflow: auto; background: var(--border-light); }
-        
         .grid { 
             display: grid; 
             grid-template-columns: repeat(7, minmax(130px, 1fr)); 
@@ -71,7 +70,7 @@
         .weekday { text-align: center; padding: 15px 0; font-size: 0.75rem; font-weight: 800; background: #FDFBF8; position: sticky; top: 0; z-index: 10; border-bottom: 1.5px solid var(--border-heavy); }
         .weekday:nth-child(1), .weekday:nth-child(7) { color: var(--weekend-red) !important; }
 
-        .day-cell { padding: 8px; display: flex; flex-direction: column; background: #FFF; cursor: pointer; position: relative; min-height: 130px; transition: background 0.2s; }
+        .day-cell { padding: 8px; display: flex; flex-direction: column; background: #FFF; cursor: pointer; position: relative; min-height: 130px; }
         .day-cell.other-month { opacity: 0.3; background: #FCFBFA; }
         
         .num-box { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
@@ -82,16 +81,14 @@
         .day-cell.today .num { color: var(--m-pink) !important; border-bottom: 2px solid var(--m-pink); }
         .holiday-tag { position: absolute; top: 8px; right: 8px; font-size: 0.55rem; color: var(--weekend-red) !important; font-weight: 900; background: rgba(197, 123, 123, 0.05); padding: 1px 4px; border-radius: 3px; }
 
-        /* 行程標籤：修正為極細框線設計 */
+        /* 行程標籤：極細 2px 設計 */
         .task-tag { 
-            font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px; 
-            border-left: 2px solid transparent; /* 極細色條 */
+            font-size: 0.75rem; padding: 3px 8px; margin-bottom: 4px; 
+            border-left: 2px solid transparent; 
             display: block; line-height: 1.4; 
-            background: transparent; /* 取消實體背景，改用輕微底色於 type */
+            background: transparent; 
             word-wrap: break-word; 
             white-space: normal; 
-            border-top: none; border-right: none; border-bottom: none;
-            border-radius: 0; /* 回歸洗鍊感 */
         }
         .task-tag.is-done { opacity: 0.3; filter: grayscale(1); }
         .task-tag.is-done .t-text { text-decoration: line-through; }
@@ -99,9 +96,9 @@
         .t-time-text { font-weight: 800; font-size: 0.6rem; opacity: 0.5; display: block; }
         .t-text { font-weight: 800; display: block; }
 
-        .type-work { border-left-color: var(--m-brown); background: rgba(191, 168, 145, 0.08); }
-        .type-life { border-left-color: var(--m-pink); background: rgba(214, 168, 168, 0.08); }
-        .type-urgent { border-left-color: var(--success-green); background: rgba(170, 176, 150, 0.08); }
+        .type-work { border-left-color: var(--m-brown); background: rgba(191, 168, 145, 0.1); }
+        .type-life { border-left-color: var(--m-pink); background: rgba(214, 168, 168, 0.1); }
+        .type-urgent { border-left-color: var(--success-green); background: rgba(170, 176, 150, 0.1); }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(74, 68, 63, 0.2); backdrop-filter: blur(2px); z-index: 150; }
         .nav-btn { background: #FFF; border: 1.5px solid var(--border-heavy); border-radius: 10px; padding: 6px 14px; cursor: pointer; font-weight: 800; }
@@ -132,28 +129,28 @@
             
             <div class="field" style="flex-direction:row; align-items:center; gap:10px;">
                 <input type="checkbox" id="timeToggle" style="width:18px; height:18px;" checked onchange="updateTimeVisibility()">
-                <label style="margin:0; cursor: pointer; font-size: 0.85rem; font-weight: 800;" for="timeToggle">開啟時間顯示</label>
+                <label style="margin:0; cursor: pointer; font-size: 0.85rem; font-weight: 800;" for="timeToggle">顯示時間</label>
             </div>
 
             <div id="timePickerSection">
-                <div class="field"><label>開始 START</label><div class="time-box"><select id="sh"></select>:<select id="sm"></select></div></div>
-                <div class="field" style="margin-top:10px;"><label>結束 END</label><div class="time-box"><select id="eh"></select>:<select id="em"></select></div></div>
+                <div class="field"><label>開始</label><div class="time-box"><select id="sh"></select>:<select id="sm"></select></div></div>
+                <div class="field" style="margin-top:10px;"><label>結束</label><div class="time-box"><select id="eh"></select>:<select id="em"></select></div></div>
             </div>
 
-            <div class="field"><label>計畫 TASK</label><input type="text" id="inText" placeholder="..."></div>
-            <div class="field"><label>備忘 MEMO</label><textarea id="inMemo" style="height: 60px;" placeholder="..."></textarea></div>
+            <div class="field"><label>計畫 TASK</label><input type="text" id="inText"></div>
+            <div class="field"><label>備忘 MEMO</label><textarea id="inMemo" style="height: 60px;"></textarea></div>
             <div class="field"><label>分類 TYPE</label><select id="inType"><option value="work">杏仁棕 (工作)</option><option value="life">灰霧粉 (生活)</option><option value="urgent">鼠尾草 (重要)</option></select></div>
             
             <button class="save-btn" onclick="saveTask()">儲存計畫</button>
             
             <div id="actionBtns" style="display: none; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1.5px dashed var(--border-heavy); padding-top: 15px;">
-                <button onclick="toggleTaskDone()" style="background:#FFF; border:1.5px solid var(--success-green); color:var(--success-green)!important; padding:12px; border-radius:15px; font-weight:800; cursor:pointer;">✅ 標記完成</button>
+                <button id="toggleDoneBtn" onclick="toggleTaskDone()" style="background:#FFF; border:1.5px solid var(--success-green); color:var(--success-green)!important; padding:12px; border-radius:15px; font-weight:800; cursor:pointer;"></button>
                 <button onclick="deleteCurrentTask()" style="background:#FFF; border:1.5px solid var(--danger-red); color:var(--danger-red)!important; padding:12px; border-radius:15px; font-weight:800; cursor:pointer;">🗑️ 刪除行程</button>
             </div>
 
             <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="nav-btn" onclick="exportData()" style="font-size: 0.75rem;">📤 匯出代碼</button>
-                <button class="nav-btn" onclick="importData()" style="font-size: 0.75rem;">📥 匯入代碼</button>
+                <button class="nav-btn" onclick="exportData()" style="font-size: 0.75rem;">📤 匯出</button>
+                <button class="nav-btn" onclick="importData()" style="font-size: 0.75rem;">📥 匯入</button>
             </div>
         </div>
         <div id="tabList" style="display:none;"><div id="fullListContainer"></div></div>
@@ -186,7 +183,7 @@
         let idx = Math.floor(((diffDays % 29.5) + 30) % 29.5) + 1;
         return lunarDays[idx > 30 ? 1 : idx];
     }
-    let db = JSON.parse(localStorage.getItem('creamy_v63')) || [];
+    let db = JSON.parse(localStorage.getItem('creamy_v64')) || [];
     let viewDate = new Date();
     let titleClicks = 0;
 
@@ -197,24 +194,19 @@
         const y = viewDate.getFullYear(), m = viewDate.getMonth();
         document.getElementById('monthDisplay').innerText = `${y} . ${String(m + 1).padStart(2, '0')}`;
         const startDate = new Date(y, m, 1 - new Date(y, m, 1).getDay());
-        
         for (let i = 0; i < 42; i++) {
             const current = new Date(startDate); current.setDate(startDate.getDate() + i);
             const dateStr = current.toLocaleDateString('en-CA');
             const cell = document.createElement('div'); cell.className = 'day-cell';
-            const mmdd = dateStr.slice(5);
-            const hName = holidayData[dateStr] || holidayData[mmdd];
+            const hName = holidayData[dateStr] || holidayData[dateStr.slice(5)];
             if (current.getDay() === 0 || current.getDay() === 6 || hName) cell.classList.add('is-holiday');
             if (hName) cell.innerHTML += `<div class="holiday-tag">${hName}</div>`;
             if (current.getMonth() !== m) cell.classList.add('other-month');
             if (dateStr === new Date().toLocaleDateString('en-CA')) cell.classList.add('today');
-
             cell.onclick = (e) => { if(!e.target.closest('.task-tag')) { clearForm(); document.getElementById('inDate').value = dateStr; toggleSidebar(true); switchTab('form'); } };
-
             const numBox = document.createElement('div'); numBox.className = 'num-box';
             numBox.innerHTML = `<span class="num">${current.getDate()}</span><span class="lunar">${getLunarDay(current)}</span>`;
             cell.appendChild(numBox);
-
             db.filter(t => t.date === dateStr).sort((a,b) => (a.st || "24:00").localeCompare(b.st || "24:00")).forEach(t => {
                 const tag = document.createElement('div'); tag.className = `task-tag type-${t.type} ${t.done ? 'is-done' : ''}`;
                 tag.innerHTML = `${t.hasTime ? `<span class="t-time-text">${t.st} - ${t.et}</span>` : ""}<span class="t-text">${t.text}</span>`;
@@ -233,20 +225,40 @@
     }
     function saveTask() {
         const id = document.getElementById('editId').value || Date.now().toString();
-        const taskData = { id, date: document.getElementById('inDate').value, text: document.getElementById('inText').value.trim() || "未命名", memo: document.getElementById('inMemo').value.trim(), type: document.getElementById('inType').value, hasTime: document.getElementById('timeToggle').checked, st: document.getElementById('sh').value + ":" + document.getElementById('sm').value, et: document.getElementById('eh').value + ":" + document.getElementById('em').value, done: id ? (db.find(x=>x.id===id)?.done || false) : false };
+        const existing = db.find(x => x.id === id);
+        const taskData = { id, date: document.getElementById('inDate').value, text: document.getElementById('inText').value.trim() || "未命名", memo: document.getElementById('inMemo').value.trim(), type: document.getElementById('inType').value, hasTime: document.getElementById('timeToggle').checked, st: document.getElementById('sh').value + ":" + document.getElementById('sm').value, et: document.getElementById('eh').value + ":" + document.getElementById('em').value, done: existing ? existing.done : false };
         const idx = db.findIndex(x => x.id === id); if(idx > -1) db[idx] = taskData; else db.push(taskData);
         save(); toggleSidebar(false); clearForm();
     }
     function openEdit(id) {
         const t = db.find(x => x.id === id);
-        document.getElementById('editId').value = t.id; document.getElementById('inDate').value = t.date; document.getElementById('inText').value = t.text; document.getElementById('inMemo').value = t.memo; document.getElementById('inType').value = t.type; document.getElementById('timeToggle').checked = t.hasTime;
+        document.getElementById('editId').value = t.id; 
+        document.getElementById('inDate').value = t.date; 
+        document.getElementById('inText').value = t.text; 
+        document.getElementById('inMemo').value = t.memo; 
+        document.getElementById('inType').value = t.type; 
+        document.getElementById('timeToggle').checked = t.hasTime;
         if(t.hasTime) { document.getElementById('sh').value = t.st.split(':')[0]; document.getElementById('sm').value = t.st.split(':')[1]; document.getElementById('eh').value = t.et.split(':')[0]; document.getElementById('em').value = t.et.split(':')[1]; }
-        updateTimeVisibility(); document.getElementById('actionBtns').style.display = 'flex'; toggleSidebar(true); switchTab('form');
+        updateTimeVisibility(); 
+        
+        // 修正點：根據狀態設定按鈕文字
+        const btn = document.getElementById('toggleDoneBtn');
+        btn.innerText = t.done ? "⏪ 恢復為未完成" : "✅ 標記為已完成";
+        
+        document.getElementById('actionBtns').style.display = 'flex'; 
+        toggleSidebar(true); switchTab('form');
     }
-    function toggleTaskDone() { const id = document.getElementById('editId').value; const task = db.find(t => t.id === id); if (task) { task.done = !task.done; save(); toggleSidebar(false); clearForm(); } }
+    function toggleTaskDone() { 
+        const id = document.getElementById('editId').value; 
+        const task = db.find(t => t.id === id); 
+        if (task) { 
+            task.done = !task.done; 
+            save(); toggleSidebar(false); clearForm(); 
+        } 
+    }
     function deleteCurrentTask() { const id = document.getElementById('editId').value; if (id && confirm('確定要刪除？')) { db = db.filter(t => t.id !== id); save(); toggleSidebar(false); clearForm(); } }
-    function clearForm() { document.getElementById('editId').value = ""; document.getElementById('inText').value = ""; document.getElementById('inMemo').value = ""; document.getElementById('actionBtns').style.display = 'none'; document.getElementById('timeToggle').checked = true; updateTimeVisibility(); }
-    function save() { localStorage.setItem('creamy_v63', JSON.stringify(db)); render(); }
+    function clearForm() { document.getElementById('editId').value = ""; document.getElementById('inText').value = ""; document.getElementById('inMemo').value = ""; document.getElementById('actionBtns').style.display = 'none'; updateTimeVisibility(); }
+    function save() { localStorage.setItem('creamy_v64', JSON.stringify(db)); render(); }
     function moveMonth(s) { viewDate.setMonth(viewDate.getMonth() + s); render(); }
     function toggleSidebar(show) { document.getElementById('sidebar').classList.toggle('active', show); document.getElementById('overlay').style.display = show ? 'block' : 'none'; }
     function handleTitleClick() { titleClicks++; if(titleClicks === 3) { toggleSidebar(true); titleClicks = 0; } setTimeout(() => titleClicks = 0, 800); }
